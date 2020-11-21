@@ -7,7 +7,7 @@ This repo contains Ultralytics inference and training code for YOLOv3 in PyTorch
 [![DOI](https://zenodo.org/badge/146165888.svg)](https://zenodo.org/badge/latestdoi/146165888)
 
 
-## Vechicle license plate recognition by YOLOv3
+## Vehicle license plate recognition by YOLOv3
 
 ![image](https://github.com/sfwang20/yolov3/blob/master/demo/1.png)
 ![image](https://github.com/sfwang20/yolov3/blob/master/demo/2.png)
