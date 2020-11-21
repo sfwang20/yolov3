@@ -9,10 +9,12 @@ This repo contains Ultralytics inference and training code for YOLOv3 in PyTorch
 
 ## Vechicle license plate recognition by YOLOv3
 
-![image](https://github.com/sfwang20/yolov3/blob/master/demo/09.png)
-![image](https://github.com/sfwang20/yolov3/blob/master/demo/14.png)
-![image](https://github.com/sfwang20/yolov3/blob/master/demo/26.png)
+![image](https://github.com/sfwang20/yolov3/blob/master/demo/1.png)
+![image](https://github.com/sfwang20/yolov3/blob/master/demo/2.png)
+![image](https://github.com/sfwang20/yolov3/blob/master/demo/3.png)
+![image](https://github.com/sfwang20/yolov3/blob/master/demo/4.png)
 
+### This task we trained on 2,200 images, fine-tuning for 40 epochs
 ## Results
 ![image](https://github.com/sfwang20/yolov3/blob/master/demo/spp-a.png)
 ![image](https://github.com/sfwang20/yolov3/blob/master/demo/testing_result.png)
