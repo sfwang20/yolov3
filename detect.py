@@ -3,7 +3,7 @@ import argparse
 from models import *  # set ONNX_EXPORT in models.py
 from utils.datasets import *
 from utils.utils import *
-
+from shutil import copy
 
 def detect(save_img=False):
     imgsz = (320, 192) if ONNX_EXPORT else opt.img_size  # (320, 192) or (416, 256) or (608, 352) for (height, width)
@@ -109,6 +109,9 @@ def detect(save_img=False):
                 p, s, im0 = path, '', im0s
 
             save_path = str(Path(out) / Path(p).name)
+            save_txt_path = str(Path(out+ '/predict_result') / Path(p).name)
+            if(not os.path.exists(out+ '/predict_result')):
+                os.mkdir(out+ '/predict_result')
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  #  normalization gain whwh
             if det is not None and len(det):
@@ -124,8 +127,8 @@ def detect(save_img=False):
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        with open(save_path[:save_path.rfind('.')] + '.txt', 'a') as file:
-                            file.write(('%g ' * 5 + '\n') % (cls, *xywh))  # label format
+                        with open(save_txt_path[:save_txt_path.rfind('.')] + '.txt', 'a') as file:
+                            file.write(('%g ' * 6 + '\n') % (cls, conf,*xywh))  # label format
 
                     if save_img or view_img:  # Add bbox to image
                         label = '%s %.2f' % (names[int(cls)], conf)
@@ -163,22 +166,48 @@ def detect(save_img=False):
 
     print('Done. (%.3fs)' % (time.time() - t0))
 
+    '''
+       將label(.txt)copy到output/ground_truth_result
+    '''
+    print("Copying label files to \'output/ground_truth_result\' ...")
+    dst = "output/ground_truth_result"
+    if not os.path.exists(dst):
+        os.mkdir(dst)
+    
+    with open("data/val.txt", "r") as f:
+        files = f.readlines() 
+        for path in files:
+            name = path[9:-4]
+            label_path = "data/labels/" + name + "txt"
+            dst = "output/ground_truth_result/"
+            copy(label_path, dst)
+    print("Done!")
+
+    """ 
+    # demo使用
+    files = os.listdir("./ground_truth_result/")
+    for f in files:
+        src = "./ground_truth_result/" + f
+        copy(src, "output/ground_truth_result/")
+        
+    """
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp.cfg', help='*.cfg path')
-    parser.add_argument('--names', type=str, default='data/coco.names', help='*.names path')
-    parser.add_argument('--weights', type=str, default='weights/yolov3-spp-ultralytics.pt', help='weights path')
-    parser.add_argument('--source', type=str, default='data/samples', help='source')  # input file/folder, 0 for webcam
+    parser.add_argument('--names', type=str, default='data/obj.names', help='*.names path')
+    parser.add_argument('--weights', type=str, default='weights/LAB3/spp-a.pt', help='weights path')
+    parser.add_argument('--source', type=str, default='data/test/', help='source')  # input file/folder, 0 for webcam
     parser.add_argument('--output', type=str, default='output', help='output folder')  # output folder
-    parser.add_argument('--img-size', type=int, default=512, help='inference size (pixels)')
+    parser.add_argument('--img-size', type=int, default=224, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.3, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.6, help='IOU threshold for NMS')
     parser.add_argument('--fourcc', type=str, default='mp4v', help='output video codec (verify ffmpeg support)')
     parser.add_argument('--half', action='store_true', help='half precision FP16 inference')
     parser.add_argument('--device', default='', help='device id (i.e. 0 or 0,1) or cpu')
     parser.add_argument('--view-img', action='store_true', help='display results')
-    parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
+    parser.add_argument('--save-txt', action='store_true', default=True, help='save results to *.txt')
     parser.add_argument('--classes', nargs='+', type=int, help='filter by class')
     parser.add_argument('--agnostic-nms', action='store_true', help='class-agnostic NMS')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
